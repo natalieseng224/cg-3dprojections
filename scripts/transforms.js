@@ -3,6 +3,7 @@ import { Matrix, Vector } from "./matrix.js";
 // create a 4x4 matrix to the perspective projection / view matrix
 function mat4x4Perspective(prp, srp, vup, clip) {
     // translate the prp to the origin
+    console.log("test");
     let translateMatrix = new Matrix(4,4);
     mat4x4Translate(translateMatrix, -1*prp[0], -1*prp[1], -1*prp[2]); 
 
@@ -34,7 +35,7 @@ function mat4x4Perspective(prp, srp, vup, clip) {
     let z = new Matrix(3); 
     z.values = [0, 0, 1]; 
     let dotProdZ = z.dot(n); 
-    let theta_z = Math.acose(dotProdZ);
+    let theta_z = Math.acos(dotProdZ);
 
     mat4x4RotateX(rotateMatrixX, theta_x);
     mat4x4RotateY(rotateMatrixY, theta_y);

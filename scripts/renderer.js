@@ -61,6 +61,13 @@ class Renderer {
     //
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        console.log(this.scene.view);
+        console.log(this.scene.view.prp);
+        let matrix = CG.mat4x4Perspective(this.scene.view.prp, this.scene.view.srp, this.scene.view.vup, this.scene.view.clip);
+
+
+
+
 
         // TODO: implement drawing here!
         // For each model
