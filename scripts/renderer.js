@@ -61,9 +61,18 @@ class Renderer {
     //
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        console.log(this.scene.view);
-        console.log(this.scene.view.prp);
         let matrix = CG.mat4x4Perspective(this.scene.view.prp, this.scene.view.srp, this.scene.view.vup, this.scene.view.clip);
+        // console.log("transform matrix check: ", matrix);
+
+        let models = this.scene.models; 
+        for (let i=0; i<models.length; i++) {
+
+            for (let j=0; j<models[i].length; j++) {
+                console.log("hi", models[i][j]);
+            }
+        }
+
+
 
 
 

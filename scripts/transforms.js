@@ -3,52 +3,34 @@ import { Matrix, Vector } from "./matrix.js";
 // create a 4x4 matrix to the perspective projection / view matrix
 function mat4x4Perspective(prp, srp, vup, clip) {
     // translate the prp to the origin
-    console.log("test");
     let translateMatrix = new Matrix(4,4);
-    mat4x4Translate(translateMatrix, -1*prp[0], -1*prp[1], -1*prp[2]); 
-
+    mat4x4Translate(translateMatrix, -1*prp.x, -1*prp.y, -1*prp.z); 
+    
     // rotate VRC such that (u,v,n) align with (x,y,z)
     // calculate (u,v,n)
-    let n = Vector3(prp[0] - srp[0], prp[1] - srp[1], prp[2] - srp[2]);  
+    let n = Vector3(prp.x - srp.x, prp.y - srp.y, prp.z - srp.z);  
     n.normalize(); 
-    let u = Vector3(vup[0], vup[1], vup[2]); 
-    u.cross(n); 
+    let vupVector = Vector3(vup.x, vup.y, vup.z); 
+    let u = vupVector.cross(n); 
     u.normalize(); 
-    let v = new Vector(u); 
-    v.cross(u); 
-
-    // initialize rotate matrices 
-    let rotateMatrixX= new Matrix(4,4);
-    let rotateMatrixY = new Matrix(4,4);
-    let rotateMatrizZ = new Matrix(4,4); 
-
-    // calculate theta for each axis
-    let x = Vector3(1, 0, 0); 
-    let dotProdX = x.dot(u); 
-    let theta_x = Math.acos(dotProdX); 
-
-    let y = Vector3(0, 1, 0); 
-    y.values = [0, 1, 0]; 
-    let dotProdY = y.dot(v); 
-    let theta_y = Math.acos(dotProdY);
-    
-    let z = new Matrix(3); 
-    z.values = [0, 0, 1]; 
-    let dotProdZ = z.dot(n); 
-    let theta_z = Math.acos(dotProdZ);
-
-    mat4x4RotateX(rotateMatrixX, theta_x);
-    mat4x4RotateY(rotateMatrixY, theta_y);
-    mat4x4RotateZ(rotateMatrixZ, theta_z);
+    let v = n.cross(u); 
+    // set rotate matrix
     let rotateMatrix = new Matrix(4,4); 
-    rotateMatrix = Matrix.multiply(rotateMatrixX, rotateMatrixY, rotateMatrizZ);
+    rotateMatrix.values = [[u.x, u.y, u.z, 0], 
+                            [v.x, v.y, v.z, 0],
+                            [n.x, n.y, n.z, 0],
+                            [0, 0, 0, 1]];
 
     // shear such that CW is on the z-axis
+    // NEED TO FIX maybe?
     let shearMatrix = new Matrix(4,4); 
-    let DOP = new Vector3(prp[0]-srp[0], prp[1]-srp[1], prp[2]-srp[2]);
-    let shear_x = -1*(DOP.x)/DOP.z; 
-    let shear_y = -1*(DOP.y)/DOP.z;
+    let dop = new Vector3(srp.x-prp.x, srp.y-prp.y, srp.z-prp.z);
+    // console.log("DOP: ", dop); 
+    let shear_x = -1*(dop.x)/dop.z; 
+    // console.log("shear_x: ", shear_x);
+    let shear_y = -1*(dop.y)/dop.z;
     mat4x4ShearXY(shearMatrix, shear_x, shear_y);
+    // console.log("shear matrix: ", shearMatrix);
 
     // scale such that view volume bounds are ([z,-z], [z, -z], [-1, zmin])
     let scaleMatrix = new Matrix(4,4); 
@@ -58,6 +40,7 @@ function mat4x4Perspective(prp, srp, vup, clip) {
     mat4x4Scale(scaleMatrix, scale_x, scale_y, scale_z);
 
     let transform = Matrix.multiply([scaleMatrix, shearMatrix, rotateMatrix, translateMatrix]);
+    // console.log("transform matrix: ", transform);
     return transform; 
     // 1. translate PRP to origin
     // 2. rotate VRC such that (u,v,n) align with (x,y,z)
