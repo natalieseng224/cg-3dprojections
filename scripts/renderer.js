@@ -63,13 +63,38 @@ class Renderer {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         let matrix = CG.mat4x4Perspective(this.scene.view.prp, this.scene.view.srp, this.scene.view.vup, this.scene.view.clip);
         // console.log("transform matrix check: ", matrix);
-
+        matrix = Matrix.multiply([matrix, CG.mat4x4MPer()]);
+        console.log(matrix);
         let models = this.scene.models; 
         for (let i=0; i<models.length; i++) {
-
-            for (let j=0; j<models[i].length; j++) {
-                console.log("hi", models[i][j]);
+            let vertices = models[i].vertices;
+            let tempVertices = [];
+            for (let j=0; j<vertices.length; j++) {
+                tempVertices[j] = Matrix.multiply([matrix, vertices[j]]);
             }
+            let edges = models[i].edges;
+            for (let i=0; i<edges.length; i++) {
+                // console.log("group number", i);
+                let currentGroup = edges[i];
+                for (let j=0; j<currentGroup.length; j++) {
+                    let v0Index = currentGroup[j];
+                    let v1Index;
+                    if (j==currentGroup.length-1) { // edge from last element to first element
+                        v1Index = currentGroup[0]; 
+                    }
+                    else {
+                        v1Index = currentGroup[j+1];
+                    }
+                    let x0 = tempVertices[v0Index].values[0] / tempVertices[v0Index].values[3];
+                    let y0 = tempVertices[v0Index].values[1] / tempVertices[v0Index].values[3];
+                    let x1 = tempVertices[v1Index].values[0] / tempVertices[v1Index].values[3];
+                    let y1 = tempVertices[v1Index].values[1] / tempVertices[v1Index].values[3];
+
+                    console.log(x0);
+                    //this.drawLine(x0, y0, x1, y1);
+                }
+            }
+
         }
 
 
