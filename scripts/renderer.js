@@ -74,28 +74,10 @@ class Renderer {
               else {
                 v1Index = currentGroup[j+1];
               }
-   
- 
               lines[index] = this.clipLinePerspective({pt0: tempVertices[v0Index], pt1: tempVertices[v1Index]}, (-1*this.scene.view.clip[4])/this.scene.view.clip[5]);
               index++; 
-              console.log(lines[index]);
 
 
-
-
-/*
-                // divide by w after we clip!!!!
-                let x0 = tempVertices[v0Index].values[0] / tempVertices[v0Index].values[3];
-                let y0 = tempVertices[v0Index].values[1] / tempVertices[v0Index].values[3];
-                let x1 = tempVertices[v1Index].values[0] / tempVertices[v1Index].values[3];
-                let y1 = tempVertices[v1Index].values[1] / tempVertices[v1Index].values[3];
-
-                   for (let j=0; j<models[i].length; j++) {
-                    console.log("hi", models[i][j]);
-                    console.log(x0);
-                    //this.drawLine(x0, y0, x1, y1);
-                }
-                */
             }
         }
     }
@@ -145,15 +127,14 @@ class Renderer {
     let out0 = this.outcodePerspective(p0, z_min);
     let out1 = this.outcodePerspective(p1, z_min);
     while (out0 !== 0 || out1 !== 0) {
-      
       if (out1 == out0) { // trivial reject 
         return null;
       }
       let out; // new intersection point 
-      if (out0 == 0) {
+      if (out0 == 0) { // point 0 inside frame
         out = out1;
       }
-      if (out1 == 0) {
+      if (out1 == 0) { // point 1 inside frame
         out = out0;
       }
       let dx = p1.x - p0.x;
@@ -183,15 +164,17 @@ class Renderer {
       let newX = p0.x + t * dx;
       let newY = p0.y + t * dy;
       let newZ = p0.z + t * dz;
-      if (out0 !== 0) {
+      if (out0 !== 0) { // point 0 was outside frame 
         p0 = CG.Vector4(newX, newY, newZ, p0.w);
         out0 = this.outcodePerspective(p0, z_min);
-      } else {
+      } else { // point 1 was outside frame 
         p1 = CG.Vector4(newX, newY, newZ, p1.w);
         out1 = this.outcodePerspective(p1, z_min);
       }
+      
     }
     result = { pt0: p0, pt1: p1 };
+    console.log({pt0: p0, pt1: p1});
 
     return result;
   }
