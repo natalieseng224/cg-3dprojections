@@ -50,8 +50,8 @@ class Renderer {
   draw() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     let matrix = CG.mat4x4Perspective(this.scene.view.prp, this.scene.view.srp, this.scene.view.vup, this.scene.view.clip);
+    matrix = Matrix.multiply([CG.mat4x4MPer(), matrix]);
     let models = this.scene.models; 
-
     let lines = [];
     let index = 0; 
     
@@ -59,11 +59,10 @@ class Renderer {
         let vertices = models[i].vertices;
         let tempVertices = [];
         for (let j=0; j<vertices.length; j++) {                
-            tempVertices[j] = Matrix.multiply([matrix, vertices[j]]); // check order 
+            tempVertices[j] = Matrix.multiply([matrix, vertices[j]]); 
         }
         let edges = models[i].edges;
         for (let i=0; i<edges.length; i++) {
-             // console.log("group number", i);
             let currentGroup = edges[i];
             for (let j=0; j<currentGroup.length; j++) {
               let v0Index = currentGroup[j];
@@ -76,9 +75,27 @@ class Renderer {
               }
               lines[index] = this.clipLinePerspective({pt0: tempVertices[v0Index], pt1: tempVertices[v1Index]}, (-1*this.scene.view.clip[4])/this.scene.view.clip[5]);
               index++; 
-
-
             }
+        }
+        for (let i=0; i<index; i++) {
+          if (lines[i] != null) {
+            // divide each by w
+            lines[i].pt0.x = lines[i].pt0.x/lines[i].pt0.w;
+            lines[i].pt0.y = lines[i].pt0.y/lines[i].pt0.w;
+            lines[i].pt0.z = lines[i].pt0.z/lines[i].pt0.w;
+            lines[i].pt0.w = lines[i].pt0.x/lines[i].pt0.w;
+
+            lines[i].pt1.x = lines[i].pt1.x/lines[i].pt1.w;
+            lines[i].pt1.y = lines[i].pt1.y/lines[i].pt1.w;
+            lines[i].pt1.z = lines[i].pt1.z/lines[i].pt1.w;
+            lines[i].pt1.w = lines[i].pt1.x/lines[i].pt1.w;
+
+            let p0 = Matrix.multiply([CG.mat4x4Viewport(this.canvas.width, this.canvas.height), lines[i].pt0]);
+            let p1 = Matrix.multiply([CG.mat4x4Viewport(this.canvas.width, this.canvas.height), lines[i].pt1]);
+
+            this.drawLine(p0.x, p0.y, p1.x, p1.y);
+
+          }
         }
     }
 
@@ -127,15 +144,15 @@ class Renderer {
     let out0 = this.outcodePerspective(p0, z_min);
     let out1 = this.outcodePerspective(p1, z_min);
     while (out0 !== 0 || out1 !== 0) {
-      if (out1 == out0) { // trivial reject 
+      if ((out0 & out1) !== 0) {
         return null;
       }
       let out; // new intersection point 
-      if (out0 == 0) { // point 0 inside frame
-        out = out1;
-      }
-      if (out1 == 0) { // point 1 inside frame
+      if (out0 != 0) { 
         out = out0;
+      }
+      else { 
+        out = out1;
       }
       let dx = p1.x - p0.x;
       let dy = p1.y - p0.y;
@@ -174,8 +191,6 @@ class Renderer {
       
     }
     result = { pt0: p0, pt1: p1 };
-    console.log({pt0: p0, pt1: p1});
-
     return result;
   }
 

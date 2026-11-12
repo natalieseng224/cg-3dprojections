@@ -10,10 +10,11 @@ function mat4x4Perspective(prp, srp, vup, clip) {
     // calculate (u,v,n)
     let n = Vector3(prp.x - srp.x, prp.y - srp.y, prp.z - srp.z);  
     n.normalize(); 
-    let vupVector = Vector3(vup.x, vup.y, vup.z); 
-    let u = vupVector.cross(n); 
+    // MAYBE NEED TO FIX
+    let u = Vector3(vup.x, vup.y, vup.z); 
+    u = u.cross(n);
     u.normalize(); 
-    let v = n.cross(u); 
+    let v = n.cross(u);  
     // set rotate matrix
     let rotateMatrix = new Matrix(4,4); 
     rotateMatrix.values = [[u.x, u.y, u.z, 0], 
@@ -22,15 +23,11 @@ function mat4x4Perspective(prp, srp, vup, clip) {
                             [0, 0, 0, 1]];
 
     // shear such that CW is on the z-axis
-    // NEED TO FIX maybe?
     let shearMatrix = new Matrix(4,4); 
-    let dop = new Vector3(prp.x-srp.x, prp.y-srp.y, prp.z-srp.z);
-    // console.log("DOP: ", dop); 
+    let dop = new Vector3((clip[0]+clip[1])/2, (clip[1]+clip[2])/2, -1*clip[4]);
     let shear_x = -1*(dop.x)/dop.z; 
-    // console.log("shear_x: ", shear_x);
     let shear_y = -1*(dop.y)/dop.z;
     mat4x4ShearXY(shearMatrix, shear_x, shear_y);
-    //console.log("shear matrix: ", shearMatrix);
 
     // scale such that view volume bounds are ([z,-z], [z, -z], [-1, zmin])
     let scaleMatrix = new Matrix(4,4); 
@@ -40,7 +37,6 @@ function mat4x4Perspective(prp, srp, vup, clip) {
     mat4x4Scale(scaleMatrix, scale_x, scale_y, scale_z);
 
     let transform = Matrix.multiply([scaleMatrix, shearMatrix, rotateMatrix, translateMatrix]);
-    // console.log("transform matrix: ", transform);
     return transform; 
     // 1. translate PRP to origin
     // 2. rotate VRC such that (u,v,n) align with (x,y,z)
