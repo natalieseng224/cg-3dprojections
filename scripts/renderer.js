@@ -86,6 +86,7 @@ class Renderer {
                 }
             }
         }
+    }
 
     // TODO: implement drawing here!
     // For each model
@@ -304,3 +305,4 @@ class Renderer {
 }
 
 export { Renderer };
+
