@@ -39,7 +39,9 @@ class Renderer {
     }
     
     //
-    moveLeft() {
+    moveLeft() { // A/D keys 
+        
+        
 
     }
     

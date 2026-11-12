@@ -24,13 +24,13 @@ function mat4x4Perspective(prp, srp, vup, clip) {
     // shear such that CW is on the z-axis
     // NEED TO FIX maybe?
     let shearMatrix = new Matrix(4,4); 
-    let dop = new Vector3(srp.x-prp.x, srp.y-prp.y, srp.z-prp.z);
+    let dop = new Vector3(prp.x-srp.x, prp.y-srp.y, prp.z-srp.z);
     // console.log("DOP: ", dop); 
     let shear_x = -1*(dop.x)/dop.z; 
     // console.log("shear_x: ", shear_x);
     let shear_y = -1*(dop.y)/dop.z;
     mat4x4ShearXY(shearMatrix, shear_x, shear_y);
-    // console.log("shear matrix: ", shearMatrix);
+    //console.log("shear matrix: ", shearMatrix);
 
     // scale such that view volume bounds are ([z,-z], [z, -z], [-1, zmin])
     let scaleMatrix = new Matrix(4,4); 
