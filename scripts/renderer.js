@@ -28,6 +28,7 @@ class Renderer {
     // TODO: update any transformations needed for animation
   }
 
+ 
   get_axes() {
     let prp = this.scene.view.prp;
     let srp = this.scene.view.srp;
@@ -38,8 +39,7 @@ class Renderer {
     u.normalize(); //perpendicular to n so it's left and right
     return { u: u, n: n };
   }
-  move_camera(distance, direction) {
-    axes = this.get_axes();
+  move_camera(direction, distance) {
     let prp = this.scene.view.prp;
     let srp = this.scene.view.srp;
     prp.x += distance * direction;
