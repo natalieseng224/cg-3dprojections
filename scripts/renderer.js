@@ -82,56 +82,91 @@ class Renderer {
   } //-1 cause n points to -z
 
   //
-  draw() {
+ draw() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    let matrix = CG.mat4x4Perspective(this.scene.view.prp, this.scene.view.srp, this.scene.view.vup, this.scene.view.clip);
+    let matrix = CG.mat4x4Perspective(
+      this.scene.view.prp,
+      this.scene.view.srp,
+      this.scene.view.vup,
+      this.scene.view.clip,
+    );
     matrix = Matrix.multiply([CG.mat4x4MPer(), matrix]);
-    let models = this.scene.models; 
+    let models = this.scene.models;
     let lines = [];
-    let index = 0; 
-    
-    for (let i=0; i<models.length; i++) {
-        let vertices = models[i].vertices;
-        let tempVertices = [];
-        for (let j=0; j<vertices.length; j++) {                
-            tempVertices[j] = Matrix.multiply([matrix, vertices[j]]); 
-        }
-        let edges = models[i].edges;
-        for (let i=0; i<edges.length; i++) {
-            let currentGroup = edges[i];
-            for (let j=0; j<currentGroup.length; j++) {
-              let v0Index = currentGroup[j];
-              let v1Index;
-              if (j==currentGroup.length-1) { // edge from last element to first element
-                v1Index = currentGroup[0]; 
-              }
-              else {
-                v1Index = currentGroup[j+1];
-              }
-              lines[index] = this.clipLinePerspective({pt0: tempVertices[v0Index], pt1: tempVertices[v1Index]}, (-1*this.scene.view.clip[4])/this.scene.view.clip[5]);
-              index++; 
-            }
-        }
-        for (let i=0; i<index; i++) {
-          if (lines[i] != null) {
-            // divide each by w
-            lines[i].pt0.x = lines[i].pt0.x/lines[i].pt0.w;
-            lines[i].pt0.y = lines[i].pt0.y/lines[i].pt0.w;
-            lines[i].pt0.z = lines[i].pt0.z/lines[i].pt0.w;
-            lines[i].pt0.w = lines[i].pt0.x/lines[i].pt0.w;
+    let index = 0;
 
-            lines[i].pt1.x = lines[i].pt1.x/lines[i].pt1.w;
-            lines[i].pt1.y = lines[i].pt1.y/lines[i].pt1.w;
-            lines[i].pt1.z = lines[i].pt1.z/lines[i].pt1.w;
-            lines[i].pt1.w = lines[i].pt1.x/lines[i].pt1.w;
+    for (let i = 0; i < models.length; i++) {
+      let vertices = models[i].vertices;
+      let tempVertices = [];
+      for (let j = 0; j < vertices.length; j++) {
+        let n = Matrix.multiply([matrix, vertices[j]]);
+        tempVertices.push(n);
+      }
 
-            let p0 = Matrix.multiply([CG.mat4x4Viewport(this.canvas.width, this.canvas.height), lines[i].pt0]);
-            let p1 = Matrix.multiply([CG.mat4x4Viewport(this.canvas.width, this.canvas.height), lines[i].pt1]);
-
-            this.drawLine(p0.x, p0.y, p1.x, p1.y);
-
+      let edges = models[i].edges;
+      for (let i = 0; i < edges.length; i++) {
+        let currentGroup = edges[i];
+        for (let j = 0; j < currentGroup.length; j++) {
+          let v0Index = currentGroup[j];
+          let v1Index;
+          if (j == currentGroup.length - 1) {
+            // edge from last element to first element
+            v1Index = currentGroup[0];
+          } else {
+            v1Index = currentGroup[j + 1];
           }
+          // lines[index] = this.clipLinePerspective(
+          //   { pt0: tempVertices[v0Index], pt1: tempVertices[v1Index] },
+          //   (-1 * this.scene.view.clip[4]) / this.scene.view.clip[5],
+          // );
+          lines[index] = {
+            pt0: CG.Vector4(
+              tempVertices[v0Index].x,
+              tempVertices[v0Index].y,
+              tempVertices[v0Index].z,
+              tempVertices[v0Index].w,
+            ),
+            pt1: CG.Vector4(
+              tempVertices[v1Index].x,
+              tempVertices[v1Index].y,
+              tempVertices[v1Index].z,
+              tempVertices[v1Index].w,
+            ),
+          };
+          index++;
         }
+      }
+      for (let i = 0; i < index; i++) {
+        if (lines[i] != null) {
+          // divide each by w
+          lines[i].pt0.x = lines[i].pt0.x / lines[i].pt0.w;
+          lines[i].pt0.y = lines[i].pt0.y / lines[i].pt0.w;
+          lines[i].pt0.z = lines[i].pt0.z / lines[i].pt0.w;
+          lines[i].pt0.w = 1.0; //w/w not x/w
+
+          lines[i].pt1.x = lines[i].pt1.x / lines[i].pt1.w;
+          lines[i].pt1.y = lines[i].pt1.y / lines[i].pt1.w;
+          lines[i].pt1.z = lines[i].pt1.z / lines[i].pt1.w;
+          lines[i].pt1.w = 1.0; //w/w not x/w
+
+          console.log(
+            lines[i].pt0.x,
+            lines[i].pt0.y,
+            lines[i].pt1.x,
+            lines[i].pt1.y,
+          );
+          let p0 = Matrix.multiply([
+            CG.mat4x4Viewport(this.canvas.width, this.canvas.height),
+            lines[i].pt0,
+          ]);
+          let p1 = Matrix.multiply([
+            CG.mat4x4Viewport(this.canvas.width, this.canvas.height),
+            lines[i].pt1,
+          ]);
+
+          this.drawLine(p0.x, p0.y, p1.x, p1.y);
+        }
+      }
     }
 
     // TODO: implement drawing here!
