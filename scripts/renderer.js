@@ -94,6 +94,16 @@ class Renderer {
     let models = this.scene.models; 
     let lines = [];
     let index = 0; 
+
+
+
+    let prp = this.scene.view.prp;
+    let srp = this.scene.view.srp;
+    let vup = this.scene.view.vup;
+    let n = CG.Vector3(prp.x - srp.x, prp.y - srp.y, prp.z - srp.z);
+    n.normalize(); //aligned to z, so it's forward and back
+    let u = vup.cross(n);
+    u.normalize(); //perpendicular to n so it's left and right
     
     for (let i = 0; i < models.length; i++) {
         let vertices = models[i].vertices;
@@ -106,34 +116,13 @@ class Renderer {
         let edges = models[i].edges;
       for (let i = 0; i < edges.length; i++) {
             let currentGroup = edges[i];
-        for (let j = 0; j < currentGroup.length; j++) {
+        for (let j = 0; j<currentGroup.length-1; j++) {
               let v0Index = currentGroup[j];
-              let v1Index;
-          if (j == currentGroup.length - 1) {
-            // edge from last element to first element
-                v1Index = currentGroup[0]; 
-          } else {
-            v1Index = currentGroup[j + 1];
-              }
+              let v1Index = currentGroup[j+1];
           lines[index] = this.clipLinePerspective(
              { pt0: tempVertices[v0Index], pt1: tempVertices[v1Index] },
              (-1 * this.scene.view.clip[4]) / this.scene.view.clip[5],
            );
-          /*lines[index] = {
-            pt0: CG.Vector4(
-              tempVertices[v0Index].x,
-              tempVertices[v0Index].y,
-              tempVertices[v0Index].z,
-              tempVertices[v0Index].w,
-            ),
-            pt1: CG.Vector4(
-              tempVertices[v1Index].x,
-              tempVertices[v1Index].y,
-              tempVertices[v1Index].z,
-              tempVertices[v1Index].w,
-            ),
-          };
-          */
               index++; 
             }
         }
@@ -332,13 +321,17 @@ class Renderer {
             );
           }
         }
-      } else {
+      } else { // CUBE OR CONE OR CYLINDER OR SPHERE
         model.center = CG.Vector4(
           scene.models[i].center[0],
           scene.models[i].center[1],
           scene.models[i].center[2],
           1,
         );
+
+        model.vertices = [];
+        model.edges = []; 
+
         for (let key in scene.models[i]) {
           if (
             scene.models[i].hasOwnProperty(key) &&
@@ -348,6 +341,57 @@ class Renderer {
             model[key] = JSON.parse(JSON.stringify(scene.models[i][key]));
           }
         }
+/*
+            "type": "cube",
+            "center": [4, 4, -10],
+            "width": 8,
+            "height": 8,
+            "depth": 8
+            */
+
+        if (model.type === "cube"){
+          
+          let center = model.center; // array of length 3
+          let x = model.height;
+
+          // top vertices
+          let center_top = [];
+          center_top[0] = center.x;
+          center_top[1] = center.y + (x/2);
+          center_top[2] = center.z;
+          model.vertices.push(CG.Vector4(center_top[0]-x/2, center_top[1], center_top[2]+x/2, 1));
+          model.vertices.push(CG.Vector4(center_top[0]+x/2, center_top[1], center_top[2]+x/2, 1));
+          model.vertices.push(CG.Vector4(center_top[0]+x/2, center_top[1], center_top[2]-x/2, 1));
+          model.vertices.push(CG.Vector4(center_top[0]-x/2, center_top[1], center_top[2]-x/2, 1));
+          // bottom vertices
+          let center_bottom = [];
+          center_bottom[0] = center.x;
+          center_bottom[1] = center.y - (x/2);
+          center_bottom[2] = center.z;
+          model.vertices.push(CG.Vector4(center_bottom[0]-x/2, center_bottom[1], center_bottom[2]+x/2, 1));
+          model.vertices.push(CG.Vector4(center_bottom[0]+x/2, center_bottom[1], center_bottom[2]+x/2, 1));
+          model.vertices.push(CG.Vector4(center_bottom[0]+x/2, center_bottom[1], center_bottom[2]-x/2, 1));
+          model.vertices.push(CG.Vector4(center_bottom[0]-x/2, center_bottom[1], center_bottom[2]-x/2, 1));
+          // edges
+          model.edges.push([0, 1, 2, 3, 0]);
+          model.edges.push([4, 5, 6, 7, 4]);
+          model.edges.push([0, 4]);
+          model.edges.push([1, 5]);
+          model.edges.push([2, 6]);
+          model.edges.push([3, 7]);
+
+          console.log(model);
+        }
+        else if (model.type === "cone") {
+
+        }
+        else if (model.type === "cylinder") {
+
+        }
+        else if (model.type === "sphere") {
+
+        }
+
       }
 
       model.matrix = new Matrix(4, 4);
