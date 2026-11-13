@@ -205,7 +205,7 @@ class Renderer {
     let out0 = this.outcodePerspective(p0, z_min);
     let out1 = this.outcodePerspective(p1, z_min);
     while (out0 !== 0 || out1 !== 0) { // trivial accept
-      if (out0 & out1 != 0) { 
+      if ((out0 & out1) != 0) { 
         return null;
       }
       let out; // new intersection point 
@@ -220,19 +220,19 @@ class Renderer {
       let dz = p1.z - p0.z;
       let t;
 
-      if (out & LEFT != 0) {
+      if ((out & LEFT) != 0) {
         t = (-p0.x + p0.z) / (dx - dz);
       }
-      else if (out & RIGHT != 0) {
+      else if ((out & RIGHT) != 0) {
         t = (p0.x + p0.z) / (-dx - dz);
       }
-      else if (out & BOTTOM != 0) {
+      else if ((out & BOTTOM) != 0) {
         t = (-p0.y + p0.z) / (dy - dz);
       }
-      else if (out & TOP != 0) {
+      else if ((out & TOP) != 0) {
         t = (p0.y + p0.z) / (-dy - dz);
       }
-      else if (out & FAR != 0) {
+      else if ((out & FAR) != 0) {
         t = (-p0.z - 1) / dz;
       }
       else {
