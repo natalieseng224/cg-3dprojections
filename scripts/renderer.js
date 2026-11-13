@@ -28,6 +28,29 @@ class Renderer {
     // TODO: update any transformations needed for animation
   }
 
+  get_axes() {
+    let prp = this.scene.view.prp;
+    let srp = this.scene.view.srp;
+    let vup = this.scene.view.vup;
+    let n = CG.Vector3(prp.x - srp.x, prp.y - srp.y, prp.z - srp.z);
+    n.normalize(); //aligned to z, so it's forward and back
+    let u = vup.cross(n);
+    u.normalize(); //perpendicular to n so it's left and right
+    return { u: u, n: n };
+  }
+  move_camera(distance, direction) {
+    axes = this.get_axes();
+    let prp = this.scene.view.prp;
+    let srp = this.scene.view.srp;
+    prp.x += distance * direction;
+    prp.y += distance * direction;
+    prp.z += distance * direction;
+    srp.x += distance * direction;
+    srp.y += distance * direction;
+    srp.z += distance * direction;
+    this.draw();
+  }
+
   //
   rotateLeft() {}
 
@@ -35,16 +58,28 @@ class Renderer {
   rotateRight() {}
 
   //
-  moveLeft() {}
+  moveLeft() {
+    let axes = this.get_axes();
+    this.move_camera(axes.u, -1);
+  }
 
   //
-  moveRight() {}
+  moveRight() {
+    let axes = this.get_axes();
+    this.move_camera(axes.u, 1);
+  }
 
   //
-  moveBackward() {}
+  moveBackward() {
+    let axes = this.get_axes();
+    this.move_camera(axes.n, 1);
+  }
 
   //
-  moveForward() {}
+  moveForward() {
+    let axes = this.get_axes();
+    this.move_camera(axes.n, -1);
+  } //-1 cause n points to -z
 
   //
   draw() {
