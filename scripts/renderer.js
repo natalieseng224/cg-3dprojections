@@ -42,12 +42,12 @@ class Renderer {
   move_camera(direction, distance) {
     let prp = this.scene.view.prp;
     let srp = this.scene.view.srp;
-    prp.x += distance * direction;
-    prp.y += distance * direction;
-    prp.z += distance * direction;
-    srp.x += distance * direction;
-    srp.y += distance * direction;
-    srp.z += distance * direction;
+    prp.x += distance * direction.x;
+    prp.y += distance * direction.y;
+    prp.z += distance * direction.z;
+    srp.x += distance * direction.x;
+    srp.y += distance * direction.y;
+    srp.z += distance * direction.z;
     this.draw();
   }
 
