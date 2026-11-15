@@ -7,11 +7,11 @@
     },
     "models": [
         {
-            "type": "cube",
-            "center": [4, 28, -10],
-            "width": 8,
-            "height": 8,
-            "depth": 8
+            "type": "cone",
+            "center": [0.0, 0.0, -60.0],
+            "radius": 50.0,
+            "height": 75.0,
+            "sides": 8
         }
 
     ]

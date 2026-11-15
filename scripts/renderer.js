@@ -383,7 +383,28 @@ class Renderer {
           console.log(model);
         }
         else if (model.type === "cone") {
+          let c = model.center;
+          let r = model.radius; 
+          let delta_degree = 2 * Math.PI / model.sides;
+          let current_degree = 0; 
+          let v_x = Math.trunc(c.x + r * Math.cos(current_degree));
+          let v_z = Math.trunc(c.z + r * Math.sin(current_degree)); 
+          while (current_degree < 2*Math.PI) {
+            model.vertices.push(CG.Vector4(v_x, c.y, v_z, 1));
+            current_degree += delta_degree; 
+            v_x = Math.trunc(c.x + r * Math.cos(current_degree)); 
+            v_z = Math.trunc(c.z + r * Math.sin(current_degree)); 
+          }
+          model.vertices.push(CG.Vector4(c.x, c.y + model.height, c.z, 1)); // top of cone
+          console.log(model.vertices);  
 
+          let bottom = []; 
+          for (let i=0; i<model.sides; i++) {
+            model.edges.push([i, model.sides]);
+            bottom.push(i);
+          }
+          bottom.push(0);
+          model.edges.push(bottom);
         }
         else if (model.type === "cylinder") {
 
