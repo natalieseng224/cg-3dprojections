@@ -92,8 +92,7 @@ class Renderer {
     );
     // matrix = Matrix.multiply([CG.mat4x4MPer(), matrix]);
     let models = this.scene.models; 
-    let lines = [];
-    let index = 0; 
+    
     let prp = this.scene.view.prp;
     let srp = this.scene.view.srp;
     let vup = this.scene.view.vup;
@@ -103,6 +102,8 @@ class Renderer {
     u.normalize(); //perpendicular to n so it's left and right
     
     for (let i = 0; i < models.length; i++) {
+        let lines = [];
+        let index = 0; 
         let vertices = models[i].vertices;
         let tempVertices = [];
       for (let j = 0; j < vertices.length; j++) {
@@ -296,6 +297,9 @@ class Renderer {
 
     for (let i = 0; i < scene.models.length; i++) {
       let model = { type: scene.models[i].type };
+      console.log("iteration ", i);
+      model.vertices = [];
+      model.edges = []; 
       if (model.type === "generic") {
         model.vertices = [];
         model.edges = JSON.parse(JSON.stringify(scene.models[i].edges));
@@ -321,9 +325,6 @@ class Renderer {
           scene.models[i].center[2],
           1,
         );
-
-        model.vertices = [];
-        model.edges = []; 
 
         for (let key in scene.models[i]) {
           if (
@@ -364,7 +365,6 @@ class Renderer {
           model.edges.push([2, 6]);
           model.edges.push([3, 7]);
         }
-
         else if (model.type === "cone") {
           let c = model.center;
           let r = model.radius; 
@@ -379,8 +379,6 @@ class Renderer {
             v_z = Math.trunc(c.z + r * Math.sin(current_degree)); 
           }
           model.vertices.push(CG.Vector4(c.x, c.y + model.height, c.z, 1)); // top of cone
-          console.log(model.vertices);  
-
           let bottom = []; 
           for (let i=0; i<model.sides; i++) {
             model.edges.push([i, model.sides]);
@@ -422,10 +420,8 @@ class Renderer {
           for (let i=0; i<model.sides; i++) {
             model.edges.push([i, i+model.sides]);
           }
-          console.log(model.edges);
           model.edges.push(edges_bottom);
           model.edges.push(edges_top);
-          console.log(model.vertices);
           
         }
         else if (model.type === "sphere") {

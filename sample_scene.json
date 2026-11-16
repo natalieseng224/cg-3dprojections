@@ -3,21 +3,21 @@
         "prp": [0, 0, 10],
         "srp": [0, 0, 0],
         "vup": [0, 1, 0],
-        "clip": [-4, 20, -1, 17, 5, 75]
+        "clip": [-6, 6, -4.5, 4.5, 5, 75]
     },
     "models": [
         {
-            "type": "cylinder",
-            "center": [10.0, 10.0, -10.0],
-            "radius": 8.0,
+            "type": "cube",
+            "center": [5.0, 5.0, -10.0],
             "height": 8.0,
-            "sides": 8.0
+            "depth": 8.0,
+            "width": 8.0
         },
         {
-            "type": "cube",
-            "center": [10.0, 10.0, -10.0],
-            "depth": 8.0,
-            "width": 8.0,
+            "type": "cone",
+            "center": [10.0, 10,0, -10.0],
+            "radius": 8.0,
+            "height": 8.0,
             "sides": 8.0
         }
     ]
