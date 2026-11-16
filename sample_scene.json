@@ -7,7 +7,7 @@
     },
     "models": [
         {
-            "type": "cone",
+            "type": "cylinder",
             "center": [0.0, 0.0, -60.0],
             "radius": 50.0,
             "height": 75.0,

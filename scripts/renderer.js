@@ -341,19 +341,10 @@ class Renderer {
             model[key] = JSON.parse(JSON.stringify(scene.models[i][key]));
           }
         }
-/*
-            "type": "cube",
-            "center": [4, 4, -10],
-            "width": 8,
-            "height": 8,
-            "depth": 8
-            */
 
         if (model.type === "cube"){
-          
           let center = model.center; // array of length 3
           let x = model.height;
-
           // top vertices
           let center_top = [];
           center_top[0] = center.x;
@@ -379,9 +370,8 @@ class Renderer {
           model.edges.push([1, 5]);
           model.edges.push([2, 6]);
           model.edges.push([3, 7]);
-
-          console.log(model);
         }
+
         else if (model.type === "cone") {
           let c = model.center;
           let r = model.radius; 
@@ -407,7 +397,43 @@ class Renderer {
           model.edges.push(bottom);
         }
         else if (model.type === "cylinder") {
-
+          let c = model.center; 
+          let r = model.radius;
+          let h = model.height; 
+          let bottom_vertices = []; 
+          let top_vertices = []; 
+          let delta_degree = 2 * Math.PI / model.sides;
+          let current_degree = 0; 
+          let v_x = Math.trunc(c.x + r * Math.cos(current_degree));
+          let v_z = Math.trunc(c.z + r * Math.sin(current_degree)); 
+          while (current_degree < 2*Math.PI) {
+            bottom_vertices.push(CG.Vector4(v_x, c.y - h/2, v_z, 1));
+            top_vertices.push(CG.Vector4(v_x, c.y + h/2, v_z, 1));
+            current_degree += delta_degree; 
+            v_x = Math.trunc(c.x + r * Math.cos(current_degree)); 
+            v_z = Math.trunc(c.z + r * Math.sin(current_degree)); 
+          }
+          let edges_bottom = [];
+          let edges_top = []; 
+          for (let i=0; i<model.sides; i++) {
+            model.vertices.push(bottom_vertices[i]);
+            edges_bottom.push(i);
+          }
+          edges_bottom.push(0);
+          for (let i = 0; i<model.sides; i++) {
+            model.vertices.push(top_vertices[i]);
+            edges_top.push(model.sides + i);
+          }
+          edges_top.push(model.sides);
+          
+          for (let i=0; i<model.sides; i++) {
+            model.edges.push([i, i+model.sides]);
+          }
+          console.log(model.edges);
+          model.edges.push(edges_bottom);
+          model.edges.push(edges_top);
+          console.log(model.vertices);
+          
         }
         else if (model.type === "sphere") {
 
