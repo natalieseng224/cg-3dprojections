@@ -94,9 +94,6 @@ class Renderer {
     let models = this.scene.models; 
     let lines = [];
     let index = 0; 
-
-
-
     let prp = this.scene.view.prp;
     let srp = this.scene.view.srp;
     let vup = this.scene.view.vup;
@@ -112,7 +109,6 @@ class Renderer {
         let n = Matrix.multiply([matrix, vertices[j]]);
         tempVertices.push(n);
         }
-
         let edges = models[i].edges;
       for (let i = 0; i < edges.length; i++) {
             let currentGroup = edges[i];
@@ -136,9 +132,6 @@ class Renderer {
               CG.mat4x4Viewport(this.canvas.width, this.canvas.height), CG.mat4x4MPer(),
               lines[i].pt1,
             ]);
-
-            //console.log(p0, p1);
-
             let p0x = p0.x / p0.w; 
             let p0y = p0.y / p0.w; 
           

@@ -10,7 +10,6 @@ function mat4x4Perspective(prp, srp, vup, clip) {
     // calculate (u,v,n)
     let n = Vector3(prp.x - srp.x, prp.y - srp.y, prp.z - srp.z);  
     n.normalize(); 
-    // MAYBE NEED TO FIX
     let u = Vector3(vup.x, vup.y, vup.z); 
     u = u.cross(n);
     u.normalize(); 

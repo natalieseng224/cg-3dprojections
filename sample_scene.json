@@ -8,11 +8,17 @@
     "models": [
         {
             "type": "cylinder",
-            "center": [0.0, 0.0, -60.0],
-            "radius": 50.0,
-            "height": 75.0,
-            "sides": 8
+            "center": [10.0, 10.0, -10.0],
+            "radius": 8.0,
+            "height": 8.0,
+            "sides": 8.0
+        },
+        {
+            "type": "cube",
+            "center": [10.0, 10.0, -10.0],
+            "depth": 8.0,
+            "width": 8.0,
+            "sides": 8.0
         }
-
     ]
 }
